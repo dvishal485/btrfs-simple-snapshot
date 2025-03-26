@@ -18,4 +18,10 @@ pub(crate) enum ApplicationError {
     SubvolumeDeletionFailed,
     #[error("Failed to parse subvolume creation time \"{1}\" : {0}")]
     CreationTimeParseFailed(chrono::ParseError, String),
+    #[error("Failed to create snapshot directory\n{0}")]
+    SnapshotDirCreateFail(std::io::Error),
+    #[error("The specified snapshot path {0} is not a directory!")]
+    InvalidSnapshotDir(PathBuf),
+    #[error("File with same name {0} already exists")]
+    SnapshotAlreadyExists(PathBuf),
 }

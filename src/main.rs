@@ -1,4 +1,5 @@
 use clap::{CommandFactory, Parser};
+use errors::ApplicationError;
 use log;
 use std::process::ExitCode;
 
@@ -24,11 +25,18 @@ fn main() -> ExitCode {
             );
             ExitCode::SUCCESS
         }
-        Action::Snapshot(args) => handle_snapshot(args),
+        Action::Snapshot(args) => {
+            if let Err(e) = handle_snapshot(args) {
+                log::error!("{}", e);
+                ExitCode::FAILURE
+            } else {
+                ExitCode::SUCCESS
+            }
+        }
     }
 }
 
-fn handle_snapshot(args: SnapshotArgs) -> ExitCode {
+fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
     let mut clog = colog::default_builder();
     clog.filter(
         None,
@@ -40,45 +48,22 @@ fn handle_snapshot(args: SnapshotArgs) -> ExitCode {
     );
     clog.init();
 
-    let mut args = make_path_absolute(args);
-
-    if !args.snapshot_path.exists() {
-        log::warn!("Snapshot directory does not exists, creating it");
-        if let Err(e) = std::fs::create_dir_all(&args.snapshot_path) {
-            log::error!("Failed to create snapshot directory\n{}", e);
-            return ExitCode::FAILURE;
-        }
-    } else if !args.snapshot_path.is_dir() {
-        log::error!(
-            "The specified snapshot path {:?} is not a directory!",
-            args.snapshot_path
-        );
-        return ExitCode::FAILURE;
-    } else {
-        log::info!("Snapshot directory already exists");
-    }
+    make_path_absolute(&mut args);
 
     let prefix = {
         if let Some(prefix) = args.prefix.take() {
             prefix
         } else {
-            let prefix = infer_prefix(&args);
-            if let Err(e) = prefix {
-                log::error!("{}", e);
-                return ExitCode::FAILURE;
-            }
-            let prefix = prefix.unwrap();
+            let prefix = infer_prefix(&args)?;
             log::info!("Snapshot prefix inferred: {:?}", prefix);
             prefix
         }
     };
 
-    let subvol = verify_path(&args);
-    if let Err(e) = subvol {
-        log::error!("{}", e);
-        return ExitCode::FAILURE;
-    }
-    let subvol = subvol.unwrap();
+    verify_path(&args)?;
+
+    log::debug!("Fetching subvolume properties");
+    let subvol = get_subvol(&args.subvol_path)?;
 
     log::debug!(
         "The specified subvolume {} with UUID {} created on {} has {} snapshots",
@@ -113,14 +98,10 @@ fn handle_snapshot(args: SnapshotArgs) -> ExitCode {
     log::info!("Snapshot file: {:?}\nPath: {:?}", filename, snapshot_file);
 
     if snapshot_file.exists() {
-        log::error!("File with same name {:?} already exists", filename);
-        return ExitCode::FAILURE;
+        return Err(ApplicationError::SnapshotAlreadyExists(filename));
     }
 
-    if let Err(e) = btrfs_snapshot(&args, snapshot_file) {
-        log::error!("{}", e);
-        return ExitCode::FAILURE;
-    };
+    btrfs_snapshot(&args, snapshot_file)?;
 
     log::debug!("Initiating removal of old snapshots");
 
@@ -134,15 +115,12 @@ fn handle_snapshot(args: SnapshotArgs) -> ExitCode {
 
     if let Some(keep) = args.count {
         if snapshots.len() > keep {
-            if let Err(e) = cleaning_job(snapshots, keep) {
-                log::error!("{}", e);
-                return ExitCode::FAILURE;
-            }
+            cleaning_job(snapshots, keep)?;
         } else {
             log::info!("No snapshots to remove, count is less than total snapshots");
         }
     }
 
     log::info!("Program finished successfully");
-    ExitCode::SUCCESS
+    Ok(())
 }
