@@ -62,6 +62,8 @@ enum ApplicationError {
     SubvolumeInfoParseFailed(SubvolumeBuilderError),
     #[error("Failed to delete older subvolume")]
     SubvolumeDeletionFailed,
+    #[error("Failed to parse subvolume creation time \"{1}\" : {0}")]
+    CreationTimeParseFailed(chrono::ParseError, String),
 }
 
 fn verify_path(args: &Args) -> Result<Subvolume, ApplicationError> {
@@ -134,11 +136,10 @@ impl<'a> TryFrom<SubvolumeInfo<'a>> for Subvolume {
                                 log::info!("Subvolume creation time: {}", time);
                                 time
                             } else {
-                                log::warn!(
-                                    "Failed to parse subvolume creation time: {}",
-                                    datetime_str
-                                );
-                                todo!("Impl mech to parse from given format")
+                                return Err(ApplicationError::CreationTimeParseFailed(
+                                    subvol_info_time.unwrap_err(),
+                                    datetime_str.to_string(),
+                                ));
                             }
                         })
                     }
