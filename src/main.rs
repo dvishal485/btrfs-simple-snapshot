@@ -1,6 +1,5 @@
 use clap::{CommandFactory, Parser};
 use errors::ApplicationError;
-use log;
 use std::process::ExitCode;
 
 mod args;
@@ -73,7 +72,7 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
         subvol.snapshots.len()
     );
 
-    if subvol.snapshots.len() > 0 {
+    if !subvol.snapshots.is_empty() {
         log::info!("Subvolume snapshots: {:?}", subvol.snapshots);
     }
 

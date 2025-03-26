@@ -17,7 +17,7 @@ pub(crate) fn cleaning_job(
             .arg("delete")
             .arg(path)
             .output()
-            .map_err(|e| ApplicationError::FailedToSpawnCmd(e))?;
+            .map_err(ApplicationError::FailedToSpawnCmd)?;
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         if !stdout.is_empty() {

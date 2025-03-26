@@ -4,7 +4,7 @@ use crate::{args::SnapshotArgs, errors::ApplicationError};
 
 pub(crate) fn btrfs_snapshot(args: &SnapshotArgs, snapshot_file: PathBuf) -> Result<(), ApplicationError> {
     let mut snapshot_cmd = Command::new("btrfs");
-    snapshot_cmd.args(&["subvolume", "snapshot"]);
+    snapshot_cmd.args(["subvolume", "snapshot"]);
     if args.readonly {
         snapshot_cmd.arg("-r");
     }
@@ -13,7 +13,7 @@ pub(crate) fn btrfs_snapshot(args: &SnapshotArgs, snapshot_file: PathBuf) -> Res
 
     let output = snapshot_cmd
         .output()
-        .map_err(|e| ApplicationError::FailedToSpawnCmd(e))?;
+        .map_err(ApplicationError::FailedToSpawnCmd)?;
 
     if args.verbose {
         let stdout = String::from_utf8_lossy(&output.stdout);

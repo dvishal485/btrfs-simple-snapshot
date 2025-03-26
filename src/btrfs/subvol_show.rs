@@ -1,6 +1,5 @@
 use chrono::NaiveDateTime;
 use derive_builder::Builder;
-use log;
 use std::{path::PathBuf, process::Command};
 
 use crate::errors::ApplicationError;
@@ -22,7 +21,7 @@ pub(crate) fn get_subvol(subvol_path: &PathBuf) -> Result<Subvolume, Application
         .arg("show")
         .arg(subvol_path)
         .output()
-        .map_err(|e| ApplicationError::FailedToSpawnCmd(e))?;
+        .map_err(ApplicationError::FailedToSpawnCmd)?;
 
     let stdout = String::from_utf8_lossy(&subvol_show.stdout);
     if !stdout.is_empty() {
@@ -39,8 +38,7 @@ pub(crate) fn get_subvol(subvol_path: &PathBuf) -> Result<Subvolume, Application
 
     let subvol_info = SubvolumeInfo(stdout);
 
-    let subvol = Subvolume::try_from(subvol_info);
-    subvol
+    Subvolume::try_from(subvol_info)
 }
 
 impl<'a> TryFrom<SubvolumeInfo<'a>> for Subvolume {
@@ -82,24 +80,17 @@ impl<'a> TryFrom<SubvolumeInfo<'a>> for Subvolume {
                         }
                     }
                 }
-            } else {
-                if snapshot_capture {
-                    let snapshot_name = data.trim();
-                    log::info!("Found snapshot {}", snapshot_name);
-                    snapshots.push(snapshot_name);
-                }
+            } else if snapshot_capture {
+                let snapshot_name = data.trim();
+                log::info!("Found snapshot {}", snapshot_name);
+                snapshots.push(snapshot_name);
             }
         }
 
-        subvol = subvol.snapshots(
-            snapshots
-                .into_iter()
-                .map(|snap| PathBuf::from(snap))
-                .collect(),
-        );
+        subvol = subvol.snapshots(snapshots.into_iter().map(PathBuf::from).collect());
 
         subvol
             .build()
-            .map_err(|e| ApplicationError::SubvolumeInfoParseFailed(e))
+            .map_err(ApplicationError::SubvolumeInfoParseFailed)
     }
 }
