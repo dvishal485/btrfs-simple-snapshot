@@ -3,6 +3,7 @@ use clap_complete::Shell;
 use std::path::PathBuf;
 
 #[derive(Parser)]
+#[command(version, about)]
 pub(crate) struct Args {
     /// Mount point of btrfs filesystem
     #[clap(long, short)]
@@ -24,7 +25,7 @@ pub(crate) struct Args {
     #[clap(long, short)]
     pub(crate) count: Option<usize>,
 
-    /// Prefix for snapshot name
+    /// Prefix for snapshot name (defaults to subvolume name)
     #[clap(long)]
     pub(crate) prefix: Option<PathBuf>,
 
