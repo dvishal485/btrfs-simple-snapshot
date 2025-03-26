@@ -5,18 +5,18 @@ use std::{path::PathBuf, process::Command};
 
 use crate::errors::ApplicationError;
 
-pub struct SubvolumeInfo<'a>(std::borrow::Cow<'a, str>);
+pub(crate) struct SubvolumeInfo<'a>(std::borrow::Cow<'a, str>);
 
 #[derive(Builder)]
 #[builder(pattern = "owned")]
-pub struct Subvolume {
-    pub name: String,
-    pub uuid: String,
-    pub snapshots: Vec<PathBuf>,
-    pub creation_time: chrono::NaiveDateTime,
+pub(crate) struct Subvolume {
+    pub(crate) name: String,
+    pub(crate) uuid: String,
+    pub(crate) snapshots: Vec<PathBuf>,
+    pub(crate) creation_time: chrono::NaiveDateTime,
 }
 
-pub fn get_subvol(subvol_path: &PathBuf) -> Result<Subvolume, ApplicationError> {
+pub(crate) fn get_subvol(subvol_path: &PathBuf) -> Result<Subvolume, ApplicationError> {
     let subvol_show = Command::new("btrfs")
         .arg("subvolume")
         .arg("show")

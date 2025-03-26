@@ -2,7 +2,7 @@ use std::{path::PathBuf, process::Command};
 
 use crate::{args::Args, errors::ApplicationError};
 
-pub fn btrfs_snapshot(args: &Args, snapshot_file: PathBuf) -> Result<(), ApplicationError> {
+pub(crate) fn btrfs_snapshot(args: &Args, snapshot_file: PathBuf) -> Result<(), ApplicationError> {
     let mut snapshot_cmd = Command::new("btrfs");
     snapshot_cmd.args(&["subvolume", "snapshot"]);
     if args.readonly {

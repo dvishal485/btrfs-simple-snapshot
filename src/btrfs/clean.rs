@@ -3,7 +3,7 @@ use std::{path::PathBuf, process::Command};
 use super::Subvolume;
 use crate::errors::ApplicationError;
 
-pub fn cleaning_job(
+pub(crate) fn cleaning_job(
     mut snapshots: Vec<(PathBuf, Subvolume)>,
     limit: usize,
 ) -> Result<(), ApplicationError> {

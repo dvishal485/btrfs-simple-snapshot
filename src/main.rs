@@ -3,8 +3,8 @@ use log;
 use std::process::ExitCode;
 
 mod args;
-pub mod btrfs;
-pub mod errors;
+pub(crate) mod btrfs;
+pub(crate) mod errors;
 mod utils;
 use args::Args;
 use btrfs::{btrfs_snapshot, cleaning_job, get_subvol};
@@ -138,5 +138,6 @@ fn main() -> ExitCode {
         }
     }
 
+    log::info!("Program finished successfully");
     ExitCode::SUCCESS
 }

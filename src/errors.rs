@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum ApplicationError {
+pub(crate) enum ApplicationError {
     #[error("The given mount point \"{0}\" is not a directory")]
     MountPointNotDir(PathBuf),
     #[error("Failed to run btrfs command")]

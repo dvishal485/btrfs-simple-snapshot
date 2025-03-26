@@ -1,6 +1,6 @@
 mod subvol_show;
-pub use subvol_show::*;
+pub(crate) use subvol_show::*;
 mod clean;
-pub use clean::*;
+pub(crate) use clean::*;
 mod snapshot;
-pub use snapshot::*;
+pub(crate) use snapshot::*;

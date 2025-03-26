@@ -7,7 +7,7 @@ use crate::{
     btrfs::{Subvolume, get_subvol},
 };
 
-pub fn verify_path(args: &Args) -> Result<Subvolume, ApplicationError> {
+pub(crate) fn verify_path(args: &Args) -> Result<Subvolume, ApplicationError> {
     log::debug!("Verifying mount point");
     if !args.mount_point.is_dir() {
         return Err(ApplicationError::MountPointNotDir(args.mount_point.clone()));
@@ -17,7 +17,7 @@ pub fn verify_path(args: &Args) -> Result<Subvolume, ApplicationError> {
     get_subvol(&args.subvol_path)
 }
 
-pub fn infer_prefix(args: &Args) -> Result<PathBuf, ApplicationError> {
+pub(crate) fn infer_prefix(args: &Args) -> Result<PathBuf, ApplicationError> {
     // try to make the subvolume name as snapshot name prefix
     if let Some(f) = args.subvol_path.file_name() {
         Ok(PathBuf::from(f))
@@ -26,7 +26,7 @@ pub fn infer_prefix(args: &Args) -> Result<PathBuf, ApplicationError> {
     }
 }
 
-pub fn make_path_absolute(mut args: Args) -> Args {
+pub(crate) fn make_path_absolute(mut args: Args) -> Args {
     let subvol_path = args.mount_point.join(&args.subvol_path);
     let snapshot_path = args.mount_point.join(&args.snapshot_path);
 
