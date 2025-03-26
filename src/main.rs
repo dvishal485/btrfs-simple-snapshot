@@ -73,9 +73,7 @@ fn btrfs_show(path: &PathBuf) -> Result<std::process::Output, ApplicationError> 
 }
 
 fn verify_subvol(args: &Args) -> Result<(), ApplicationError> {
-    if args.verbose {
-        log::debug!("Verifying subvolume properties");
-    }
+    log::debug!("Verifying subvolume properties");
 
     let subvol_show = btrfs_show(&args.subvol_path)?;
 
@@ -138,15 +136,21 @@ fn main() -> ExitCode {
     }
 
     let mut clog = colog::default_builder();
-    clog.filter(None, log::LevelFilter::max());
+
+    clog.filter(
+        None,
+        if args.verbose {
+            log::LevelFilter::max()
+        } else {
+            log::LevelFilter::Error
+        },
+    );
     clog.init();
 
     let mut args = make_path_absolute(args);
 
     if !args.snapshot_path.exists() {
-        if args.verbose {
-            log::warn!("Snapshot directory does not exists, creating it")
-        }
+        log::warn!("Snapshot directory does not exists, creating it");
         if let Err(e) = std::fs::create_dir_all(&args.snapshot_path) {
             log::error!("Failed to create snapshot directory\n{}", e);
             return ExitCode::FAILURE;
@@ -157,7 +161,7 @@ fn main() -> ExitCode {
             args.snapshot_path
         );
         return ExitCode::FAILURE;
-    } else if args.verbose {
+    } else {
         log::info!("Snapshot directory already exists");
     }
 
@@ -171,9 +175,7 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
             let prefix = prefix.unwrap();
-            if args.verbose {
-                log::info!("Snapshot prefix inferred: {:?}", prefix);
-            }
+            log::info!("Snapshot prefix inferred: {:?}", prefix);
             prefix
         }
     };
@@ -189,12 +191,10 @@ fn main() -> ExitCode {
         .to_string()
         .replace('/', "-");
 
-    if args.verbose {
-        log::info!(
-            "Current datetime: {curr_time}\nSnapshot suffix: {:?}",
-            suffix
-        );
-    }
+    log::info!(
+        "Current datetime: {curr_time}\nSnapshot suffix: {:?}",
+        suffix
+    );
 
     let mut filename = prefix.clone();
     if !suffix.is_empty() {
@@ -203,9 +203,7 @@ fn main() -> ExitCode {
     }
     let snapshot_file = args.snapshot_path.join(&filename);
 
-    if args.verbose {
-        log::info!("Snapshot file: {:?}\nPath: {:?}", filename, snapshot_file);
-    }
+    log::info!("Snapshot file: {:?}\nPath: {:?}", filename, snapshot_file);
 
     if snapshot_file.exists() {
         log::error!("File with same name {:?} already exists", filename);
