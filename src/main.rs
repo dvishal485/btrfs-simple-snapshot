@@ -6,25 +6,30 @@ mod args;
 pub(crate) mod btrfs;
 pub(crate) mod errors;
 mod utils;
-use args::Args;
+use args::{Action, Cli, SnapshotArgs};
 use btrfs::{btrfs_snapshot, cleaning_job, get_subvol};
 use utils::*;
 
 fn main() -> ExitCode {
-    let args = Args::parse();
-    if let Some(shell) = args.shell_completion {
-        let cmd = &mut Args::command();
-        clap_complete::generate(
-            shell,
-            cmd,
-            cmd.get_name().to_string(),
-            &mut std::io::stdout(),
-        );
-        return ExitCode::SUCCESS;
+    let cli = Cli::parse();
+
+    match cli.command {
+        Action::Completion(args) => {
+            let cmd = &mut Cli::command();
+            clap_complete::generate(
+                args.shell_completion,
+                cmd,
+                cmd.get_name().to_string(),
+                &mut std::io::stdout(),
+            );
+            ExitCode::SUCCESS
+        }
+        Action::Snapshot(args) => handle_snapshot(args),
     }
+}
 
+fn handle_snapshot(args: SnapshotArgs) -> ExitCode {
     let mut clog = colog::default_builder();
-
     clog.filter(
         None,
         if args.verbose {

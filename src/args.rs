@@ -1,20 +1,38 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use clap_complete::Shell;
 use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(version, about)]
-pub(crate) struct Args {
+pub(crate) struct Cli {
+    #[command(subcommand)]
+    pub(crate) command: Action,
+}
+
+#[derive(Subcommand)]
+pub(crate) enum Action {
+    Completion(CompletionArgs),
+    Snapshot(SnapshotArgs),
+}
+
+#[derive(Parser)]
+/// Generate shell completions file
+pub(crate) struct CompletionArgs {
+    /// Compatible shell for completions file
+    pub(crate) shell_completion: Shell,
+}
+
+#[derive(Parser)]
+/// With btrfs-auto-snapshot paired with a cron job or timer, you can easily create snapshots of btrfs subvolumes and maintain a particular number of snapshots at disposal for simpler backup solution.
+pub(crate) struct SnapshotArgs {
     /// Mount point of btrfs filesystem
-    #[clap(long, short)]
     pub(crate) mount_point: PathBuf,
 
     /// Path to subvolume to snapshot (relative to mount point)
-    #[clap(long, short = 'p')]
     pub(crate) subvol_path: PathBuf,
 
     /// Path in which snapshots are stored (relative to mount point)
-    #[clap(long, short = 's', default_value = ".snapshots")]
+    #[clap(long, short, default_value = ".snapshots")]
     pub(crate) snapshot_path: PathBuf,
 
     /// Make snapshot readonly
@@ -36,8 +54,4 @@ pub(crate) struct Args {
     /// Verbose output logging
     #[clap(long)]
     pub(crate) verbose: bool,
-
-    /// Generate shell completions for given shell
-    #[clap(long)]
-    pub(crate) shell_completion: Option<Shell>,
 }
