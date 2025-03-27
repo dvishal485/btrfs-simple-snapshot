@@ -24,4 +24,8 @@ pub(crate) enum ApplicationError {
     InvalidSnapshotDir(PathBuf),
     #[error("File with same name {0} already exists")]
     SnapshotAlreadyExists(PathBuf),
+    #[error("Atleast one of --keep-count or --keep-since is required for cleaning")]
+    NoCleaningArg,
+    #[error("Time interval too big to work with")]
+    TimeOutOfRange,
 }

@@ -35,6 +35,9 @@ pub(crate) struct CleanSubcommand {
     pub(crate) subvol_args: SubvolumeArgs,
     #[clap(flatten)]
     pub(crate) cleaning_args: CleaningArgs,
+    /// Limit clean task only to mentioned path (relative to mount point)
+    #[clap(short, long, default_value = "/")]
+    pub(crate) path: PathBuf,
 }
 
 #[derive(Parser)]
@@ -46,7 +49,7 @@ pub(crate) struct SnapshotSubcommand {
     pub(crate) snapshot_args: SnapshotArgs,
 
     #[clap(flatten)]
-    pub(crate) cleaning_args: CleaningArgs,
+    pub(crate) cleaning_args: Option<CleaningArgs>,
 }
 
 #[derive(Parser)]
@@ -77,10 +80,20 @@ pub(crate) struct SnapshotArgs {
 }
 
 #[derive(Parser)]
+#[clap(after_help = "You must specify at least one of --keep-count or --keep-since.")]
 pub(crate) struct CleaningArgs {
     /// Specify to limit the number of snapshots to keep
-    #[clap(long, short)]
+    #[clap(long, short = 'c')]
     pub(crate) keep_count: Option<usize>,
 
-
+    /// Do not clean snapshots younger than given duration.
+    ///
+    /// Example: 5d (5 days), 6h 30m (6 hours 30 minutes), 1y (1 year), 5M 1w (5 months 1 week)
+    ///
+    /// This takes precedence over "--keep-count", i.e. - Even if number of younger
+    /// snapshots is greater than keep_count, they are not removed.
+    ///
+    /// Only the older snapshots are considered for removal.
+    #[clap(long, short = 's')]
+    pub(crate) keep_since: Option<humantime::Duration>,
 }

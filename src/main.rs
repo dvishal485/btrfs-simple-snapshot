@@ -7,7 +7,7 @@ pub(crate) mod btrfs;
 pub(crate) mod errors;
 mod utils;
 use args::{Action, Cli, SnapshotSubcommand};
-use btrfs::{btrfs_snapshot, cleaning_job, get_subvol};
+use btrfs::{btrfs_snapshot, cleaning_job, get_subvol, handle_clean};
 use utils::*;
 
 fn main() -> ExitCode {
@@ -44,7 +44,12 @@ fn main() -> ExitCode {
             }
         }
         Action::Clean(args) => {
-            todo!("Cleaning subcommand not implemented yet")
+            if let Err(e) = handle_clean(args) {
+                log::error!("{}", e);
+                ExitCode::FAILURE
+            } else {
+                ExitCode::SUCCESS
+            }
         }
     }
 }
@@ -62,22 +67,10 @@ fn handle_snapshot(mut args: SnapshotSubcommand) -> Result<(), ApplicationError>
         }
     };
 
-    verify_path(&args)?;
+    verify_mount_path(&args.subvol_args)?;
+    verify_snapshot_path(&args.snapshot_args)?;
 
-    log::debug!("Fetching subvolume properties");
-    let subvol = get_subvol(&args.subvol_args.subvol_path)?;
-
-    log::debug!(
-        "The specified subvolume {} with UUID {} created on {} has {} snapshots",
-        subvol.name,
-        subvol.uuid,
-        subvol.creation_time,
-        subvol.snapshots.len()
-    );
-
-    if !subvol.snapshots.is_empty() {
-        log::info!("Subvolume snapshots: {:?}", subvol.snapshots);
-    }
+    let subvol = get_subvol_wrapped(&args.subvol_args.subvol_path)?;
 
     let curr_time = chrono::Local::now();
     let suffix = curr_time
@@ -115,12 +108,8 @@ fn handle_snapshot(mut args: SnapshotSubcommand) -> Result<(), ApplicationError>
         .filter_map(|s| get_subvol(&s).ok().map(|subvol| (s, subvol)))
         .collect();
 
-    if let Some(keep) = args.cleaning_args.keep_count {
-        if snapshots.len() > keep {
-            cleaning_job(snapshots, keep)?;
-        } else {
-            log::info!("No snapshots to remove, count is less than total snapshots");
-        }
+    if let Some(cleaning_args) = args.cleaning_args {
+        cleaning_job(snapshots, cleaning_args, curr_time.naive_local())?
     }
 
     log::info!("Program finished successfully");

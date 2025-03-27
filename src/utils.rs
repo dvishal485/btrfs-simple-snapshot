@@ -1,30 +1,37 @@
 use std::path::PathBuf;
 
-use crate::SnapshotSubcommand;
+use crate::args::{SnapshotArgs, SubvolumeArgs};
+use crate::btrfs::Subvolume;
 use crate::errors::ApplicationError;
+use crate::{SnapshotSubcommand, get_subvol};
 
-pub(crate) fn verify_path(args: &SnapshotSubcommand) -> Result<(), ApplicationError> {
+#[inline]
+pub(crate) fn verify_mount_path(args: &SubvolumeArgs) -> Result<(), ApplicationError> {
     log::debug!("Verifying mount point");
-    if !args.subvol_args.mount_point.is_dir() {
-        return Err(ApplicationError::MountPointNotDir(
-            args.subvol_args.mount_point.to_owned(),
-        ));
+    if !args.mount_point.is_dir() {
+        Err(ApplicationError::MountPointNotDir(
+            args.mount_point.to_owned(),
+        ))
+    } else {
+        Ok(())
     }
+}
 
+#[inline]
+pub(crate) fn verify_snapshot_path(args: &SnapshotArgs) -> Result<(), ApplicationError> {
     log::debug!("Verifying snapshot path");
-    if !args.snapshot_args.snapshot_path.exists() {
+    if !args.snapshot_path.exists() {
         log::warn!("Snapshot directory does not exists, creating it");
-        std::fs::create_dir_all(&args.snapshot_args.snapshot_path)
-            .map_err(ApplicationError::SnapshotDirCreateFail)?;
-    } else if !args.snapshot_args.snapshot_path.is_dir() {
-        return Err(ApplicationError::InvalidSnapshotDir(
-            args.snapshot_args.snapshot_path.to_owned(),
-        ));
+        std::fs::create_dir_all(&args.snapshot_path)
+            .map_err(ApplicationError::SnapshotDirCreateFail)
+    } else if !args.snapshot_path.is_dir() {
+        Err(ApplicationError::InvalidSnapshotDir(
+            args.snapshot_path.to_owned(),
+        ))
     } else {
         log::info!("Snapshot directory already exists");
+        Ok(())
     }
-
-    Ok(())
 }
 
 #[inline]
@@ -59,4 +66,23 @@ pub(crate) fn make_path_absolute(args: &mut SnapshotSubcommand) {
 
     args.subvol_args.subvol_path = subvol_path;
     args.snapshot_args.snapshot_path = snapshot_path;
+}
+
+pub(crate) fn get_subvol_wrapped(path: &PathBuf) -> Result<Subvolume, ApplicationError> {
+    log::debug!("Fetching subvolume properties");
+    let subvol = get_subvol(path)?;
+
+    log::debug!(
+        "The specified subvolume {} with UUID {} created on {} has {} snapshots",
+        subvol.name,
+        subvol.uuid,
+        subvol.creation_time,
+        subvol.snapshots.len()
+    );
+
+    if !subvol.snapshots.is_empty() {
+        log::info!("Subvolume snapshots: {:?}", subvol.snapshots);
+    }
+
+    Ok(subvol)
 }
