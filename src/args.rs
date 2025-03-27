@@ -17,6 +17,7 @@ pub(crate) struct Cli {
 pub(crate) enum Action {
     Completion(CompletionArgs),
     Snapshot(SnapshotArgs),
+    Clean(CleaningArgs),
 }
 
 #[derive(Parser)]

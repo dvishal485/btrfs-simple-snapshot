@@ -43,6 +43,9 @@ fn main() -> ExitCode {
                 ExitCode::SUCCESS
             }
         }
+        Action::Clean(args) => {
+            todo!("Cleaning subcommand not implemented yet")
+        }
     }
 }
 
