@@ -112,7 +112,7 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
         .filter_map(|s| get_subvol(&s).ok().map(|subvol| (s, subvol)))
         .collect();
 
-    if let Some(keep) = args.count {
+    if let Some(keep) = args.keep_count {
         if snapshots.len() > keep {
             cleaning_job(snapshots, keep)?;
         } else {

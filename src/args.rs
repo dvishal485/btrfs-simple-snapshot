@@ -41,7 +41,7 @@ pub(crate) struct SnapshotArgs {
 
     /// Specify to limit the number of snapshots to keep
     #[clap(long, short)]
-    pub(crate) count: Option<usize>,
+    pub(crate) keep_count: Option<usize>,
 
     /// Prefix for snapshot name (defaults to subvolume name)
     #[clap(long)]
