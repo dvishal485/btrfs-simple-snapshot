@@ -48,7 +48,7 @@ pub(crate) struct SnapshotArgs {
     pub(crate) prefix: Option<PathBuf>,
 
     /// Datetime suffix format for snapshot name
-    #[clap(long, short, default_value = "%Y-%m-%d-%H%M%S")]
+    #[clap(long, short = 'f', default_value = "%Y-%m-%d-%H%M%S")]
     pub(crate) suffix_format: String,
 
     /// Verbose output logging
