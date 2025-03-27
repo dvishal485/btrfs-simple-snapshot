@@ -41,16 +41,14 @@ pub(crate) fn make_path_absolute(args: &mut SnapshotArgs) {
     let subvol_path = args.mount_point.join(&args.subvol_path);
     let snapshot_path = args.mount_point.join(&args.snapshot_path);
 
-    if args.verbose {
-        log::info!(
-            "Making absolute path with base set as mount point {:?}\nSubvolume path: {:?} -> {:?}\nSnapshot path: {:?} -> {:?}",
-            args.mount_point,
-            args.subvol_path,
-            subvol_path,
-            args.snapshot_path,
-            snapshot_path
-        );
-    }
+    log::info!(
+        "Making absolute path with base set as mount point {:?}\nSubvolume path: {:?} -> {:?}\nSnapshot path: {:?} -> {:?}",
+        args.mount_point,
+        args.subvol_path,
+        subvol_path,
+        args.snapshot_path,
+        snapshot_path
+    );
 
     args.subvol_path = subvol_path;
     args.snapshot_path = snapshot_path;

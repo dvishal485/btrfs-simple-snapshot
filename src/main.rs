@@ -13,6 +13,17 @@ use utils::*;
 fn main() -> ExitCode {
     let cli = Cli::parse();
 
+    let mut clog = colog::default_builder();
+    clog.filter(
+        None,
+        if cli.verbose {
+            log::LevelFilter::max()
+        } else {
+            log::LevelFilter::Error
+        },
+    );
+    clog.init();
+
     match cli.command {
         Action::Completion(args) => {
             let cmd = &mut Cli::command();
@@ -36,17 +47,6 @@ fn main() -> ExitCode {
 }
 
 fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
-    let mut clog = colog::default_builder();
-    clog.filter(
-        None,
-        if args.verbose {
-            log::LevelFilter::max()
-        } else {
-            log::LevelFilter::Error
-        },
-    );
-    clog.init();
-
     make_path_absolute(&mut args);
 
     let prefix = {
@@ -112,7 +112,7 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
         .filter_map(|s| get_subvol(&s).ok().map(|subvol| (s, subvol)))
         .collect();
 
-    if let Some(keep) = args.keep_count {
+    if let Some(keep) = args.cleaning_args.keep_count {
         if snapshots.len() > keep {
             cleaning_job(snapshots, keep)?;
         } else {

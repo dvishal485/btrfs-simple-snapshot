@@ -7,6 +7,10 @@ use std::path::PathBuf;
 pub(crate) struct Cli {
     #[command(subcommand)]
     pub(crate) command: Action,
+
+    /// Verbose output logging
+    #[clap(long, global = true)]
+    pub(crate) verbose: bool,
 }
 
 #[derive(Subcommand)]
@@ -39,10 +43,6 @@ pub(crate) struct SnapshotArgs {
     #[clap(long, short)]
     pub(crate) readonly: bool,
 
-    /// Specify to limit the number of snapshots to keep
-    #[clap(long, short)]
-    pub(crate) keep_count: Option<usize>,
-
     /// Prefix for snapshot name (defaults to subvolume name)
     #[clap(long)]
     pub(crate) prefix: Option<PathBuf>,
@@ -51,7 +51,16 @@ pub(crate) struct SnapshotArgs {
     #[clap(long, short = 'f', default_value = "%Y-%m-%d-%H%M%S")]
     pub(crate) suffix_format: String,
 
-    /// Verbose output logging
-    #[clap(long)]
-    pub(crate) verbose: bool,
+    /// Cleaning arguments
+    #[clap(flatten)]
+    pub(crate) cleaning_args: CleaningArgs,
+}
+
+#[derive(Parser)]
+pub(crate) struct CleaningArgs {
+    /// Specify to limit the number of snapshots to keep
+    #[clap(long, short)]
+    pub(crate) keep_count: Option<usize>,
+
+
 }
