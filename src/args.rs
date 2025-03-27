@@ -15,14 +15,43 @@ pub(crate) struct Cli {
 
 #[derive(Subcommand)]
 pub(crate) enum Action {
-    Completion(CompletionArgs),
-    Snapshot(SnapshotArgs),
-    Clean(CleaningArgs),
+    Completion(CompletionSubcommand),
+    Snapshot(SnapshotSubcommand),
+    Clean(CleanSubcommand),
+}
+
+#[derive(Parser)]
+pub(crate) struct SubvolumeArgs {
+    /// Mount point of btrfs filesystem
+    pub(crate) mount_point: PathBuf,
+
+    /// Path to subvolume to snapshot (relative to mount point)
+    pub(crate) subvol_path: PathBuf,
+}
+
+#[derive(Parser)]
+pub(crate) struct CleanSubcommand {
+    #[clap(flatten)]
+    pub(crate) subvol_args: SubvolumeArgs,
+    #[clap(flatten)]
+    pub(crate) cleaning_args: CleaningArgs,
+}
+
+#[derive(Parser)]
+pub(crate) struct SnapshotSubcommand {
+    #[clap(flatten)]
+    pub(crate) subvol_args: SubvolumeArgs,
+
+    #[clap(flatten)]
+    pub(crate) snapshot_args: SnapshotArgs,
+
+    #[clap(flatten)]
+    pub(crate) cleaning_args: CleaningArgs,
 }
 
 #[derive(Parser)]
 /// Generate shell completions file
-pub(crate) struct CompletionArgs {
+pub(crate) struct CompletionSubcommand {
     /// Compatible shell for completions file
     pub(crate) shell_completion: Shell,
 }
@@ -30,12 +59,6 @@ pub(crate) struct CompletionArgs {
 #[derive(Parser)]
 /// With btrfs-auto-snapshot paired with a cron job or timer, you can easily create snapshots of btrfs subvolumes and maintain a particular number of snapshots at disposal for simpler backup solution.
 pub(crate) struct SnapshotArgs {
-    /// Mount point of btrfs filesystem
-    pub(crate) mount_point: PathBuf,
-
-    /// Path to subvolume to snapshot (relative to mount point)
-    pub(crate) subvol_path: PathBuf,
-
     /// Path in which snapshots are stored (relative to mount point)
     #[clap(long, short, default_value = ".snapshots")]
     pub(crate) snapshot_path: PathBuf,
@@ -51,10 +74,6 @@ pub(crate) struct SnapshotArgs {
     /// Datetime suffix format for snapshot name
     #[clap(long, short = 'f', default_value = "%Y-%m-%d-%H%M%S")]
     pub(crate) suffix_format: String,
-
-    /// Cleaning arguments
-    #[clap(flatten)]
-    pub(crate) cleaning_args: CleaningArgs,
 }
 
 #[derive(Parser)]

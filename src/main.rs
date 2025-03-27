@@ -6,7 +6,7 @@ mod args;
 pub(crate) mod btrfs;
 pub(crate) mod errors;
 mod utils;
-use args::{Action, Cli, SnapshotArgs};
+use args::{Action, Cli, SnapshotSubcommand};
 use btrfs::{btrfs_snapshot, cleaning_job, get_subvol};
 use utils::*;
 
@@ -49,11 +49,11 @@ fn main() -> ExitCode {
     }
 }
 
-fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
+fn handle_snapshot(mut args: SnapshotSubcommand) -> Result<(), ApplicationError> {
     make_path_absolute(&mut args);
 
     let prefix = {
-        if let Some(prefix) = args.prefix.take() {
+        if let Some(prefix) = args.snapshot_args.prefix.take() {
             prefix
         } else {
             let prefix = infer_prefix(&args)?;
@@ -65,7 +65,7 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
     verify_path(&args)?;
 
     log::debug!("Fetching subvolume properties");
-    let subvol = get_subvol(&args.subvol_path)?;
+    let subvol = get_subvol(&args.subvol_args.subvol_path)?;
 
     log::debug!(
         "The specified subvolume {} with UUID {} created on {} has {} snapshots",
@@ -81,7 +81,7 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
 
     let curr_time = chrono::Local::now();
     let suffix = curr_time
-        .format(&args.suffix_format)
+        .format(&args.snapshot_args.suffix_format)
         .to_string()
         .replace('/', "-");
 
@@ -95,7 +95,7 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
         filename.as_mut_os_string().push("-");
         filename.as_mut_os_string().push(suffix);
     }
-    let snapshot_file = args.snapshot_path.join(&filename);
+    let snapshot_file = args.snapshot_args.snapshot_path.join(&filename);
 
     log::info!("Snapshot file: {:?}\nPath: {:?}", filename, snapshot_file);
 
@@ -110,8 +110,8 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
     let snapshots: Vec<_> = subvol
         .snapshots
         .iter()
-        .map(|s| args.mount_point.join(s))
-        .filter(|s| s.starts_with(&args.snapshot_path))
+        .map(|s| args.subvol_args.mount_point.join(s))
+        .filter(|s| s.starts_with(&args.snapshot_args.snapshot_path))
         .filter_map(|s| get_subvol(&s).ok().map(|subvol| (s, subvol)))
         .collect();
 
