@@ -40,7 +40,7 @@ pub(crate) fn infer_prefix(args: &SnapshotSubcommand) -> Result<PathBuf, Applica
     args.subvol_args
         .subvol_path
         .file_name()
-        .map(|f| PathBuf::from(f))
+        .map(PathBuf::from)
         .ok_or(ApplicationError::PrefixInferenceFailed)
 }
 
