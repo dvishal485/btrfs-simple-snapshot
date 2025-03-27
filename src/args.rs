@@ -49,7 +49,7 @@ pub(crate) struct SnapshotArgs {
 
     /// Datetime suffix format for snapshot name
     #[clap(long, short, default_value = "%Y-%m-%d-%H%M%S")]
-    pub(crate) datetime_format: String,
+    pub(crate) suffix_format: String,
 
     /// Verbose output logging
     #[clap(long)]

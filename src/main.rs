@@ -78,7 +78,7 @@ fn handle_snapshot(mut args: SnapshotArgs) -> Result<(), ApplicationError> {
 
     let curr_time = chrono::Local::now();
     let suffix = curr_time
-        .format(&args.datetime_format)
+        .format(&args.suffix_format)
         .to_string()
         .replace('/', "-");
 
