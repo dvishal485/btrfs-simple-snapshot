@@ -36,7 +36,7 @@ pub(crate) struct CleanSubcommand {
     #[clap(flatten)]
     pub(crate) cleaning_args: CleaningArgs,
     /// Limit clean task only to mentioned path (relative to mount point)
-    #[clap(short, long, default_value = "/")]
+    #[clap(short, long, default_value = ".snapshots")]
     pub(crate) path: PathBuf,
 }
 
