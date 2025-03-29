@@ -6,7 +6,7 @@ use thiserror::Error;
 pub(crate) enum ApplicationError {
     #[error("The given mount point \"{0}\" is not a directory")]
     MountPointNotDir(PathBuf),
-    #[error("Failed to run btrfs command")]
+    #[error("Failed to run btrfs command. {0}")]
     FailedToSpawnCmd(std::io::Error),
     #[error("Failed to query the given subvolume")]
     SubvolumeError,
