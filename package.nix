@@ -3,12 +3,14 @@
   rustPlatform,
   installShellFiles,
   btrfs-progs,
+  makeBinaryWrapper,
   rev ? "dirty",
 }:
 
 let
   cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
   pname = "btrfs-simple-snapshot";
+  runtimeDeps = [ btrfs-progs ];
   version = "${cargoToml.package.version}-${rev}";
 in
 rustPlatform.buildRustPackage {
@@ -32,6 +34,7 @@ rustPlatform.buildRustPackage {
 
   nativeBuildInputs = [
     installShellFiles
+    makeBinaryWrapper
   ];
 
   buildInputs = [ btrfs-progs ];
@@ -43,6 +46,10 @@ rustPlatform.buildRustPackage {
     $out/bin/${pname} completion fish > completions/${pname}.fish
 
     installShellCompletion completions/*
+  '';
+
+  postFixup = ''
+    wrapProgram $out/bin/${pname} --prefix PATH : ${lib.makeBinPath runtimeDeps}
   '';
 
   meta = {
