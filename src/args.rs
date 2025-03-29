@@ -36,8 +36,8 @@ pub(crate) struct CleanSubcommand {
     #[clap(flatten)]
     pub(crate) cleaning_args: CleaningArgs,
     /// Limit clean task only to mentioned path (relative to mount point)
-    #[clap(short, long, default_value = ".snapshots")]
-    pub(crate) path: PathBuf,
+    #[clap(long, short = 'p', default_value = ".snapshots")]
+    pub(crate) snapshot_path: PathBuf,
 }
 
 #[derive(Parser)]
@@ -63,11 +63,11 @@ pub(crate) struct CompletionSubcommand {
 /// Paired with a cron job or timer, you can easily create snapshots of btrfs subvolumes and maintain a particular number of snapshots at disposal for simpler backup solution.
 pub(crate) struct SnapshotArgs {
     /// Path in which snapshots are stored (relative to mount point)
-    #[clap(long, short, default_value = ".snapshots")]
+    #[clap(long, short = 'p', default_value = ".snapshots")]
     pub(crate) snapshot_path: PathBuf,
 
     /// Make snapshot readonly
-    #[clap(long, short)]
+    #[clap(long, short = 'r')]
     pub(crate) readonly: bool,
 
     /// Prefix for snapshot name (defaults to subvolume name)

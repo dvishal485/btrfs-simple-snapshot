@@ -18,7 +18,7 @@ pub(crate) fn handle_clean(mut args: CleanSubcommand) -> Result<(), ApplicationE
         .subvol_args
         .mount_point
         .join(args.subvol_args.subvol_path);
-    args.path = args.subvol_args.mount_point.join(args.path);
+    args.snapshot_path = args.subvol_args.mount_point.join(args.snapshot_path);
 
     let subvol = get_subvol_wrapped(&args.subvol_args.subvol_path)?;
 
@@ -26,7 +26,7 @@ pub(crate) fn handle_clean(mut args: CleanSubcommand) -> Result<(), ApplicationE
         .snapshots
         .iter()
         .map(|s| args.subvol_args.mount_point.join(s))
-        .filter(|s| s.starts_with(&args.path))
+        .filter(|s| s.starts_with(&args.snapshot_path))
         .filter_map(|s| get_subvol(&s).ok().map(|subvol| (s, subvol)))
         .collect();
 
