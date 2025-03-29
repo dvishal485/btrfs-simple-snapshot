@@ -29,7 +29,7 @@ Paired with a cron job or timer, you can easily create snapshots of btrfs subvol
 
 ```nix
 {
-  inputs.btrfs-simple-snapshot.url =  "github:dvishal485/btrfs-simple-snapshot/v0.1.3"; # Replace with the latest version
+  inputs.btrfs-simple-snapshot.url = "github:dvishal485/btrfs-simple-snapshot/v0.1.4"; # Replace with the latest version
   outputs = { self, nixpkgs, btrfs-simple-snapshot }: {
     nixosConfigurations.my-host = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
