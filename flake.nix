@@ -19,6 +19,18 @@
         btrfs-simple-snapshot = final.callPackage ./package.nix { inherit rev; };
       };
 
+      nixosModules.default =
+        {
+          config,
+          lib,
+          pkgs,
+          ...
+        }:
+        import ./nixos-module.nix {
+          inherit lib config pkgs;
+          btrfs-simple-snapshot = self.packages.${pkgs.system}.btrfs-simple-snapshot;
+        };
+
       packages = supportedSystems (pkgs: rec {
         btrfs-simple-snapshot = pkgs.callPackage ./package.nix { inherit rev; };
         default = btrfs-simple-snapshot;
