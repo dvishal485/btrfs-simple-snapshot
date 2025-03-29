@@ -41,9 +41,9 @@ rustPlatform.buildRustPackage {
 
   preFixup = ''
     mkdir completions
-    $out/bin/${pname} completion bash > completions/${pname}.bash
-    $out/bin/${pname} completion zsh > completions/${pname}.zsh
-    $out/bin/${pname} completion fish > completions/${pname}.fish
+    $out/bin/${pname} completions bash > completions/${pname}.bash
+    $out/bin/${pname} completions zsh > completions/${pname}.zsh
+    $out/bin/${pname} completions fish > completions/${pname}.fish
 
     installShellCompletion completions/*
   '';

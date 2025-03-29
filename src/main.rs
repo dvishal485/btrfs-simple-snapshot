@@ -25,7 +25,7 @@ fn main() -> ExitCode {
     clog.init();
 
     match cli.command {
-        Action::Completion(args) => {
+        Action::Completions(args) => {
             let cmd = &mut Cli::command();
             clap_complete::generate(
                 args.shell_completion,

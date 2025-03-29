@@ -15,7 +15,7 @@ pub(crate) struct Cli {
 
 #[derive(Subcommand)]
 pub(crate) enum Action {
-    Completion(CompletionSubcommand),
+    Completions(CompletionSubcommand),
     Snapshot(SnapshotSubcommand),
     Clean(CleanSubcommand),
 }
