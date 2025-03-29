@@ -16,12 +16,12 @@
     in
     {
       overlays.default = final: prev: {
-        btrfs-auto-snapshot = final.callPackage ./package.nix { inherit rev; };
+        btrfs-simple-snapshot = final.callPackage ./package.nix { inherit rev; };
       };
 
       packages = supportedSystems (pkgs: rec {
-        btrfs-auto-snapshot = pkgs.callPackage ./package.nix { inherit rev; };
-        default = btrfs-auto-snapshot;
+        btrfs-simple-snapshot = pkgs.callPackage ./package.nix { inherit rev; };
+        default = btrfs-simple-snapshot;
       });
     };
 }

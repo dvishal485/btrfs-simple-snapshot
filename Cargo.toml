@@ -1,5 +1,5 @@
 [package]
-name = "btrfs-auto-snapshot"
+name = "btrfs-simple-snapshot"
 description = "Create and manage Btrfs snapshots automatically"
 version = "0.1.0"
 authors = ["Vishal Das <26341736+dvishal485@users.noreply.github.com>"]
