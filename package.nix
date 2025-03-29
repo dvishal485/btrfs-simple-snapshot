@@ -8,7 +8,7 @@
 
 let
   cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
-  pname = "${cargoToml.package.name}";
+  pname = "btrfs-simple-snapshot";
   version = "${cargoToml.package.version}-${rev}";
 in
 rustPlatform.buildRustPackage {
