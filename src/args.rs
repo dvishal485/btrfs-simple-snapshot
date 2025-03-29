@@ -71,7 +71,7 @@ pub(crate) struct CompletionSubcommand {
 }
 
 #[derive(Parser)]
-/// Paired with a cron job or timer, you can easily create snapshots of btrfs subvolumes and maintain a particular number of snapshots at disposal for simpler backup solution.
+/// Create snapshots of btrfs subvolumes and optionally invoke cleaning
 pub(crate) struct SnapshotArgs {
     /// Path in which snapshots are stored (relative to mount point)
     #[clap(long, short = 'p', default_value = ".snapshots")]
