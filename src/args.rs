@@ -1,9 +1,20 @@
-use clap::{Parser, Subcommand};
+use clap::{
+    Parser, Subcommand,
+    builder::{Styles, styling::AnsiColor},
+};
 use clap_complete::Shell;
 use std::path::PathBuf;
 
+fn make_style() -> Styles {
+    Styles::styled()
+        .header(AnsiColor::Yellow.on_default().bold())
+        .usage(AnsiColor::Green.on_default().bold())
+        .literal(AnsiColor::Blue.on_default().bold())
+        .placeholder(AnsiColor::Cyan.on_default())
+}
+
 #[derive(Parser)]
-#[command(version, about)]
+#[command(version, about, styles=make_style())]
 pub(crate) struct Cli {
     #[command(subcommand)]
     pub(crate) command: Action,
