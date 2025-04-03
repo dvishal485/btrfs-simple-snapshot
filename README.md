@@ -82,7 +82,7 @@ This is an example for reference which mounts the btrfs subvolume to a temporary
           subvolume = "home";
           snapshot-path = "backups";
           snapshot = {
-            enable = false;
+            enable = true;
             args = {
               readonly = true;
               suffix-format = "%Y-%m-%d-%H.%M.%S";
