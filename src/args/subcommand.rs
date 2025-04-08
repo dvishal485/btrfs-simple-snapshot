@@ -19,7 +19,7 @@ pub(crate) struct CleanSubcommand {
 }
 
 #[derive(Parser)]
-/// Create snapshots of btrfs subvolumes and optionally invoke cleaning
+/// Create snapshots of subvolumes and optionally invoke cleaning
 pub(crate) struct SnapshotSubcommand {
     #[clap(flatten)]
     pub(crate) subvol_args: SubvolumeArgs,
