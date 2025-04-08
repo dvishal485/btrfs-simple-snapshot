@@ -1,6 +1,6 @@
 use std::{path::PathBuf, process::Command};
 
-use crate::{args::SnapshotSubcommand, errors::ApplicationError};
+use crate::{errors::ApplicationError, subcommand::SnapshotSubcommand};
 
 pub(crate) fn btrfs_snapshot(
     args: &SnapshotSubcommand,

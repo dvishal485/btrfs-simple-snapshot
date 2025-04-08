@@ -2,12 +2,15 @@ use clap::{CommandFactory, Parser};
 use errors::ApplicationError;
 use std::process::ExitCode;
 
-mod args;
 pub(crate) mod btrfs;
+#[path = "args/mod.rs"]
+mod cli;
 pub(crate) mod errors;
 mod utils;
-use args::{Action, Cli, SnapshotSubcommand};
+
 use btrfs::{btrfs_snapshot, cleaning_job, get_subvol, handle_clean};
+use cli::cli::{Action, Cli};
+pub(crate) use cli::{argument as args, subcommand};
 use utils::*;
 
 fn main() -> ExitCode {
@@ -54,7 +57,7 @@ fn main() -> ExitCode {
     }
 }
 
-fn handle_snapshot(mut args: SnapshotSubcommand) -> Result<(), ApplicationError> {
+fn handle_snapshot(mut args: subcommand::SnapshotSubcommand) -> Result<(), ApplicationError> {
     make_path_absolute(&mut args);
 
     let prefix = {

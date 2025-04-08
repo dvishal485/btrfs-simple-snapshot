@@ -2,11 +2,8 @@ use chrono::{Local, NaiveDateTime, TimeDelta};
 use std::{path::PathBuf, process::Command};
 
 use super::Subvolume;
-use crate::{
-    args::{CleanSubcommand, CleaningArgs},
-    errors::ApplicationError,
-    get_subvol, get_subvol_wrapped, verify_mount_path,
-};
+use crate::{args::CleaningArgs, subcommand::CleanSubcommand};
+use crate::{errors::ApplicationError, get_subvol, get_subvol_wrapped, verify_mount_path};
 
 pub(crate) fn handle_clean(mut args: CleanSubcommand) -> Result<(), ApplicationError> {
     verify_mount_path(&args.subvol_args)?;

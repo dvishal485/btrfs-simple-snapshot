@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use crate::args::{SnapshotArgs, SubvolumeArgs};
 use crate::btrfs::Subvolume;
 use crate::errors::ApplicationError;
-use crate::{SnapshotSubcommand, get_subvol};
+use crate::get_subvol;
+use crate::subcommand::SnapshotSubcommand;
 
 #[inline]
 pub(crate) fn verify_mount_path(args: &SubvolumeArgs) -> Result<(), ApplicationError> {
