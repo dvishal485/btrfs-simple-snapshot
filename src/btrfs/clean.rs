@@ -67,6 +67,11 @@ pub(crate) fn cleaning_job(
         }
     }?;
 
+    if snapshots.len() < deletion_idx {
+        log::info!("Number of snapshots is within given limit, no cleaning required");
+        return Ok(());
+    }
+
     for (path, s) in snapshots.drain(deletion_idx..) {
         remove_snapshot(s, path)?
     }
